@@ -1,0 +1,1 @@
+export default function RGPage() { return <main className="mx-auto max-w-3xl p-6 text-slate-200"><h1 className="text-3xl font-bold">Responsible Gambling</h1><p className="mt-4">Only wager what you can afford to lose. Take breaks and seek help if betting causes harm.</p></main>; }

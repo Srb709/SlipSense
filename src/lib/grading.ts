@@ -58,6 +58,20 @@ function flattenLegs(tickets: BetTicket[]) {
   return tickets.flatMap((ticket) => ticket.legs);
 }
 
+
+function buildCleanerSuggestion(tickets: BetTicket[], totalRisk: number, bankroll: number) {
+  const actions: string[] = [];
+  if (tickets.some((t) => t.type === "parlay")) actions.push("Consider splitting parlays into smaller singles.");
+  if (tickets.some((t) => t.legs.some((l) => l.market === "nrfi-yrfi"))) actions.push("Consider reducing stacked NRFI/YRFI exposure.");
+  if (bankroll > 0 && totalRisk / bankroll > 0.08) actions.push("Consider reducing stake size to keep total risk near 1-5% of bankroll.");
+  if (tickets.some((t) => t.legs.some((l) => l.market === "player-prop"))) actions.push("Verify lineup, injury, and weather news before keeping player props.");
+  if (actions.length === 0) actions.push("Structure is relatively clean; keep stake discipline and re-check odds before placing.");
+  return {
+    title: "Cleaner Structure Suggestion",
+    actions,
+    rationale: "These changes reduce compounding variance, limit bankroll drawdown risk, and improve review clarity."
+  };
+}
 export function analyzeLeg(leg: BetLeg, allTickets: BetTicket[]): LegAnalysis {
   const allLegs = flattenLegs(allTickets);
   const impliedProbability = typeof leg.odds === "number" ? americanOddsToImpliedProbability(leg.odds) : null;
@@ -336,8 +350,16 @@ export function analyzeSlip(tickets: BetTicket[], bankroll?: number): SlipAnalys
   const sorted = [...ticketAnalyses].sort((a, b) => b.score - a.score);
   const finalScore = clampScore(score);
   const grade = scoreToGrade(finalScore);
+  const cleanerSuggestion = buildCleanerSuggestion(safeTickets, totalRisk, bankroll ?? 0);
 
   return {
+    mainDrivers: [
+      `Structure grade ${grade} from ticket mix and pricing pressure.`,
+      `Total risk is ${totalRisk.toFixed(2)} against bankroll ${(bankroll ?? 0).toFixed(2)}.`,
+      `${parlayCount} parlay ticket(s) increase volatility.`
+    ],
+    biggestRisk: flags[0]?.label ?? "No major structural risk flagged",
+    cleanerSuggestion,
     score: finalScore,
     grade,
     totalRisk,

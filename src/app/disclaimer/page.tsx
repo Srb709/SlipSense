@@ -1,0 +1,1 @@
+export default function DisclaimerPage() { return <main className="mx-auto max-w-3xl p-6 text-slate-200"><h1 className="text-3xl font-bold">Disclaimer</h1><p className="mt-4">SlipSense reviews structural risk only. It does not place bets, guarantee winners, or provide picks/signals.</p></main>; }

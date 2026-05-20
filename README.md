@@ -411,3 +411,12 @@ Clean pitch:
 Longer pitch:
 
 > SlipSense reviews your bet slip before you place it, explains what is risky, calculates break-even math, and helps you avoid dumb parlay and bankroll mistakes.
+
+## Paste My Slip
+Use the Paste My Slip box to paste rough lines like `TB ML -110 $11`. SlipSense parses likely tickets, flags lines it cannot parse, and asks you to review entries before trusting grades.
+
+## PWA install
+This app includes a web manifest/theme color/apple touch icon using SVG assets. On iPhone Safari, open the site, tap Share, then **Add to Home Screen**.
+
+> TODO: If you need broad legacy PWA/App Store-style compatibility, add PNG icon renditions manually (e.g. 192x192 and 512x512). This repo intentionally keeps icon assets text-only (SVG) to avoid binary commits.
+

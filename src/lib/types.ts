@@ -64,6 +64,9 @@ export type TicketAnalysis = {
 };
 
 export type SlipAnalysis = {
+  mainDrivers: string[];
+  biggestRisk: string;
+  cleanerSuggestion: CleanerSuggestion;
   score: number;
   grade: Grade;
   totalRisk: number;
@@ -80,4 +83,10 @@ export type ExtractedSlipPayload = {
   tickets: BetTicket[];
   warnings?: string[];
   source?: "ai-image" | "manual" | "demo";
+};
+
+export type CleanerSuggestion = {
+  title: string;
+  actions: string[];
+  rationale: string;
 };
