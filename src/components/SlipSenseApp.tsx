@@ -7,6 +7,8 @@ import { analyzeSlip } from "@/lib/grading";
 import { demoTickets } from "@/lib/demo-data";
 import type { BetMarket, BetTicket, TicketType } from "@/lib/types";
 import { formatMoney, newId } from "@/lib/utils";
+import { parseSlipText } from "@/lib/paste-parser";
+import Link from "next/link";
 
 const STORAGE_KEY = "slipsense-tickets-v1";
 const BANKROLL_KEY = "slipsense-bankroll-v1";
@@ -56,6 +58,8 @@ export default function SlipSenseApp() {
   const [storageMessage, setStorageMessage] = useState<string | null>(null);
   const [imageMessage, setImageMessage] = useState<string | null>(null);
   const [imageLoading, setImageLoading] = useState(false);
+  const [pasteText, setPasteText] = useState("");
+  const [pasteWarnings, setPasteWarnings] = useState<string[]>([]);
 
   useEffect(() => {
     try {
@@ -192,6 +196,17 @@ export default function SlipSenseApp() {
     }
   }
 
+
+  function parsePastedSlip() {
+    const results = parseSlipText(pasteText);
+    const parsed = results.filter((r) => r.parsed && r.ticket).map((r) => r.ticket!);
+    const warnings = results.filter((r) => !r.parsed).map((r) => `${r.line}: ${r.warning}`);
+    setPasteWarnings(warnings);
+    if (parsed.length) {
+      setTickets((current) => [...current, ...parsed]);
+    }
+  }
+
   function exportReport() {
     const blob = new Blob([JSON.stringify({ tickets, bankroll, analysis }, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -278,6 +293,13 @@ export default function SlipSenseApp() {
                 onChange={(event) => void analyzeImage(event.target.files?.[0] ?? null)}
               />
               {imageMessage ? <p className="mt-3 text-sm text-slate-400">{imageMessage}</p> : null}
+            </div>
+          <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-6">
+              <h2 className="text-xl font-black text-white">Paste My Slip</h2>
+              <textarea className={`${inputClass} mt-4 min-h-28`} value={pasteText} onChange={(e) => setPasteText(e.target.value)} placeholder="TB ML -110 $11" />
+              <button className={`${buttonClass} mt-3 w-full`} onClick={parsePastedSlip}>Parse pasted slip</button>
+              <p className="mt-2 text-xs text-slate-400">Parsed lines are added as draft tickets. Review every field before trusting the grade.</p>
+              {pasteWarnings.map((w) => <p key={w} className="mt-2 text-xs text-amber-300">{w}</p>)}
             </div>
           </aside>
 
@@ -408,6 +430,11 @@ export default function SlipSenseApp() {
           </section>
         </section>
       </section>
+    <footer className="mx-auto mt-10 max-w-7xl border-t border-slate-800 py-6 text-sm text-slate-400">
+        <div className="flex flex-wrap gap-4">
+          <Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/responsible-gambling">Responsible Gambling</Link><Link href="/disclaimer">Disclaimer</Link>
+        </div>
+      </footer>
     </main>
   );
 }

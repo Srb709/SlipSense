@@ -1,0 +1,1 @@
+export default function TermsPage() { return <main className="mx-auto max-w-3xl p-6 text-slate-200"><h1 className="text-3xl font-bold">Terms</h1><p className="mt-4">SlipSense does not guarantee outcomes and is not financial advice. Use only if legal betting age in your jurisdiction.</p></main>; }

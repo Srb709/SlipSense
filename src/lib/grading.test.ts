@@ -35,3 +35,9 @@ describe("grading", () => {
     expect(analysis.flags.length).toBeGreaterThan(0);
   });
 });
+
+it("builds cleaner structure suggestions", () => {
+  const result = analyzeSlip(demoTickets, 500);
+  expect(result.cleanerSuggestion.title).toContain("Cleaner");
+  expect(result.mainDrivers.length).toBeGreaterThan(0);
+});

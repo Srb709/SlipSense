@@ -1,0 +1,1 @@
+export default function PrivacyPage() { return <main className="mx-auto max-w-3xl p-6 text-slate-200"><h1 className="text-3xl font-bold">Privacy</h1><p className="mt-4">SlipSense is educational software and does not place bets. We store slip data in your browser local storage for MVP usage.</p></main>; }
