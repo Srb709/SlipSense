@@ -11,8 +11,28 @@ export type ParsedLineResult = {
 function inferMarket(text: string): BetMarket {
   const lower = text.toLowerCase();
   if (lower.includes("nrfi") || lower.includes("yrfi")) return "nrfi-yrfi";
+
+  const playerPropKeywords = [
+    "prop",
+    "outs",
+    "strikeout",
+    "points",
+    "rebounds",
+    "assists",
+    "yards",
+    "touchdowns",
+    "hits",
+    "bases",
+    "saves",
+    "shots"
+  ];
+
+  const hasPlayerPropKeyword = playerPropKeywords.some((keyword) => lower.includes(keyword));
+  const hasOverUnder = /\b(over|under)\b/i.test(text);
+  const looksLikeNamedProp = hasOverUnder && /\b[A-Z][a-z]+\s+[A-Z][a-z]+\b/.test(text);
+
+  if (hasPlayerPropKeyword || looksLikeNamedProp) return "player-prop";
   if (lower.includes("over") || lower.includes("under") || lower.includes("total")) return "total";
-  if (lower.includes("prop") || lower.includes("outs") || lower.includes("strikeout") || lower.includes("points")) return "player-prop";
   if (lower.includes("ml") || lower.includes("moneyline")) return "moneyline";
   return "other";
 }

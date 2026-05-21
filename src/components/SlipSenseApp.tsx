@@ -298,7 +298,7 @@ export default function SlipSenseApp() {
               <h2 className="text-xl font-black text-white">Paste My Slip</h2>
               <textarea className={`${inputClass} mt-4 min-h-28`} value={pasteText} onChange={(e) => setPasteText(e.target.value)} placeholder="TB ML -110 $11" />
               <button className={`${buttonClass} mt-3 w-full`} onClick={parsePastedSlip}>Parse pasted slip</button>
-              <p className="mt-2 text-xs text-slate-400">Parsed lines are added as draft tickets. Review every field before trusting the grade.</p>
+              <p className="mt-2 text-xs text-slate-400">Parsed parlays are added as draft tickets only. Add or edit legs, markets, and odds manually before using any grade.</p>
               {pasteWarnings.map((w) => <p key={w} className="mt-2 text-xs text-amber-300">{w}</p>)}
             </div>
           </aside>
