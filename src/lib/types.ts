@@ -20,12 +20,6 @@ export type PropertyRecord = {
   yearsOwned: number;
   absenteeOwner: boolean;
   outOfPhillyOwner: boolean;
-  distressedFlag: boolean;
-  recentTransfer: boolean;
-  sheriffSignal: boolean;
-  delinquencySignal: boolean;
-  latestTransferDate?: string;
-  latestDocumentType?: string;
   leadScore: number;
   tags: LeadTag[];
 };
@@ -38,5 +32,5 @@ export type Filters = {
   minValue?: number;
   maxValue?: number;
   minYearsOwned?: number;
-  leadType?: 'all' | 'absentee' | 'longTerm' | 'distressed' | 'investor';
+  leadType?: 'all' | 'absentee' | 'longTerm' | 'twentyPlus' | 'outOfPhilly' | 'highScore';
 };
