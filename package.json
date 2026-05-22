@@ -1,8 +1,8 @@
 {
-  "name": "slipsense",
+  "name": "my-philly-leads-tool",
   "version": "0.1.0",
   "private": true,
-  "description": "AI-powered bet slip analyzer for grading wagers, parlays, odds risk, and bankroll exposure.",
+  "description": "Philadelphia real estate lead finder using public open data",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
