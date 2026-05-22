@@ -1,10 +1,10 @@
 export type LeadTag =
   | 'Absentee Owner'
   | 'Long-Term Owner'
+  | '20+ Year Owner'
   | 'Out-of-Philly Owner'
-  | 'Recent Transfer'
-  | 'Sheriff/Distress Signal'
-  | 'Lower Assessed Value';
+  | 'Good Value Range'
+  | 'Very Low Value';
 
 export type PropertyRecord = {
   id: string;
@@ -32,7 +32,9 @@ export type PropertyRecord = {
 
 export type Filters = {
   neighborhood?: string;
+  zipCode?: string;
   propertyType?: string;
+  includeVacantLand?: boolean;
   minValue?: number;
   maxValue?: number;
   minYearsOwned?: number;
