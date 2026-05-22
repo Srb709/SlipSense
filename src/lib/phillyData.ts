@@ -23,14 +23,6 @@ const normalizeAddress = (raw?: string) =>
     .join(' ')
     .trim();
 
-const inLastMonths = (date?: string, months = 18) => {
-  if (!date) return false;
-  const then = new Date(date);
-  if (Number.isNaN(then.getTime())) return false;
-  const now = new Date();
-  return now.getTime() - then.getTime() <= months * 30 * 24 * 60 * 60 * 1000;
-};
-
 function score(row: PropertyRecord) {
   let s = 0;
   if (row.absenteeOwner) s += 25;
@@ -57,36 +49,48 @@ function buildWhere(filters: Filters) {
 
 export async function fetchLeads(filters: Filters): Promise<PropertyRecord[]> {
   const where = buildWhere(filters);
+
+  // NOTE: Philly open-data schemas can change over time.
+  // This query intentionally sticks to currently verified OPA columns and avoids
+  // transfer-table joins until a stable shared key/table contract is re-verified.
   const sql = `
-    with base as (
-      select
-        o.opa_account_num, o.location, o.zip_code, o.category_code_description,
-        o.owners, o.mailing_address_1, o.mailing_address_2, o.mailing_city_state, o.mailing_zip,
-        o.market_value, o.sale_date,
-        rtt.recording_date as transfer_date, rtt.document_type,
-        case when lower(coalesce(rtt.document_type,'')) like '%sheriff%' then true else false end as sheriff_signal,
-        case when lower(coalesce(rtt.document_type,'')) like '%tax%' then true else false end as delinquency_signal
-      from opa_properties_public o
-      left join rtt_summary rtt on rtt.opa_account_num = o.opa_account_num
-      ${where}
-      order by o.market_value asc
-      limit 400
-    ), ranked as (
-      select *, row_number() over(partition by opa_account_num order by transfer_date desc nulls last) rn from base
-    )
-    select * from ranked where rn=1
+    select
+      parcel_number,
+      location,
+      zip_code,
+      category_code_description,
+      owner_1,
+      owner_2,
+      mailing_address_1,
+      mailing_address_2,
+      mailing_city_state,
+      mailing_zip,
+      market_value,
+      sale_date
+    from opa_properties_public
+    ${where}
+    order by market_value asc
+    limit 400
   `;
+
   const res = await fetch(`${OPA_BASE}?q=${encodeURIComponent(sql)}`, { next: { revalidate: 1800 } });
-  if (!res.ok) throw new Error(`Failed to fetch Philly data: ${res.status}`);
+  if (!res.ok) {
+    const details = await res.text();
+    throw new Error(`Failed to fetch Philly data: ${res.status}. ${details.slice(0, 700)}`);
+  }
+
   const data = await res.json();
   let rows: PropertyRecord[] = (data.rows || []).map((row: any) => {
     const yearsOwned = row.sale_date ? Math.max(0, new Date().getFullYear() - new Date(row.sale_date).getFullYear()) : 0;
     const mailingAddress = [row.mailing_address_1, row.mailing_address_2, row.mailing_city_state, row.mailing_zip].filter(Boolean).join(', ');
     const absenteeOwner = normalizeAddress(row.location) !== normalizeAddress(row.mailing_address_1);
     const outOfPhillyOwner = !(String(row.mailing_city_state || '').toLowerCase().includes('philadelphia') || String(row.mailing_zip || '').startsWith('191'));
-    const recentTransfer = inLastMonths(row.transfer_date);
-    const sheriffSignal = Boolean(row.sheriff_signal);
-    const delinquencySignal = Boolean(row.delinquency_signal);
+
+    // TODO: Re-enable real transfer/distress signals once a verified transfer table and join key are confirmed in Carto metadata.
+    const recentTransfer = false;
+    const sheriffSignal = false;
+    const delinquencySignal = false;
+
     const distressedFlag = sheriffSignal || delinquencySignal || (yearsOwned >= 10 && outOfPhillyOwner);
     const tags: LeadTag[] = [];
     if (absenteeOwner) tags.push('Absentee Owner');
@@ -97,12 +101,12 @@ export async function fetchLeads(filters: Filters): Promise<PropertyRecord[]> {
     if (Number(row.market_value) <= 200000) tags.push('Lower Assessed Value');
 
     const rec: PropertyRecord = {
-      id: String(row.opa_account_num),
+      id: String(row.parcel_number || row.location || ''),
       address: row.location || 'Unknown',
       neighborhood: filters.neighborhood || 'Philadelphia',
       zipCode: row.zip_code || '',
       propertyType: row.category_code_description || 'Unknown',
-      ownerName: row.owners || 'Unknown',
+      ownerName: [row.owner_1, row.owner_2].filter(Boolean).join(' / ') || 'Unknown',
       mailingAddress: mailingAddress || 'Unknown',
       mailingCityState: row.mailing_city_state || '',
       marketValue: Number(row.market_value) || 0,
@@ -114,8 +118,8 @@ export async function fetchLeads(filters: Filters): Promise<PropertyRecord[]> {
       recentTransfer,
       sheriffSignal,
       delinquencySignal,
-      latestTransferDate: row.transfer_date,
-      latestDocumentType: row.document_type,
+      latestTransferDate: undefined,
+      latestDocumentType: undefined,
       leadScore: 0,
       tags
     };
