@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 type ApiResponse = {
@@ -30,7 +31,8 @@ export default function EnrichmentDashboard() {
   useEffect(() => { refresh(); }, []);
 
   return <main className="max-w-7xl mx-auto p-6 space-y-4">
-    <div className="flex items-center justify-between"><h1 className="text-2xl font-bold">Contact Enrichment Review</h1><button className="bg-blue-700 text-white px-3 py-2 rounded" onClick={refresh}>Refresh</button></div>
+    <div className="flex items-center justify-between"><h1 className="text-2xl font-bold">Contact Enrichment Review</h1><div className="flex gap-2"><Link href="/dashboard" className="bg-slate-800 text-white px-3 py-2 rounded">Back to Dashboard</Link><button className="bg-blue-700 text-white px-3 py-2 rounded" onClick={refresh}>Refresh</button></div></div>
+    <p className="text-xs text-amber-700">Candidate contact info requires human review before use. Check DNC/compliance before calling or texting.</p>
     {loading && <p className="text-slate-500">Loading…</p>}
     <section className="bg-white rounded shadow p-4">
       <h2 className="font-semibold mb-2">Jobs</h2>
