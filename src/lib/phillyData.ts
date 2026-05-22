@@ -129,11 +129,6 @@ export async function fetchLeads(filters: Filters): Promise<PropertyRecord[]> {
     const absenteeOwner = normalizeAddress(row.location) !== normalizeAddress(row.mailing_address_1);
     const outOfPhillyOwner = !(String(row.mailing_city_state || '').toLowerCase().includes('philadelphia') || String(row.mailing_zip || '').startsWith('191'));
 
-    const recentTransfer = false;
-    const sheriffSignal = false;
-    const delinquencySignal = false;
-
-    const distressedFlag = sheriffSignal || delinquencySignal || (yearsOwned >= 10 && outOfPhillyOwner);
     const tags: LeadTag[] = [];
     if (absenteeOwner) tags.push('Absentee Owner');
     if (yearsOwned >= 10) tags.push('Long-Term Owner');
@@ -156,12 +151,6 @@ export async function fetchLeads(filters: Filters): Promise<PropertyRecord[]> {
       yearsOwned,
       absenteeOwner,
       outOfPhillyOwner,
-      distressedFlag,
-      recentTransfer,
-      sheriffSignal,
-      delinquencySignal,
-      latestTransferDate: undefined,
-      latestDocumentType: undefined,
       leadScore: 0,
       tags
     };
@@ -178,8 +167,9 @@ export async function fetchLeads(filters: Filters): Promise<PropertyRecord[]> {
     const tests = {
       absentee: (r: PropertyRecord) => r.absenteeOwner,
       longTerm: (r: PropertyRecord) => r.yearsOwned >= 10,
-      distressed: (r: PropertyRecord) => r.distressedFlag,
-      investor: (r: PropertyRecord) => r.absenteeOwner && r.outOfPhillyOwner
+      twentyPlus: (r: PropertyRecord) => r.yearsOwned >= 20,
+      outOfPhilly: (r: PropertyRecord) => r.outOfPhillyOwner,
+      highScore: (r: PropertyRecord) => r.leadScore >= 70
     } as const;
     rows = rows.filter(tests[filters.leadType]);
   }
