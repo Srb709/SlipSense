@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="SlipSense icon">
-  <rect width="512" height="512" rx="96" fill="#020617"/>
-  <circle cx="256" cy="256" r="168" fill="#0ea5e9" opacity="0.22"/>
-  <path d="M128 300c46-14 86-56 128-56 42 0 72 28 128 16" fill="none" stroke="#38bdf8" stroke-width="28" stroke-linecap="round"/>
-  <path d="M146 208h220" stroke="#e2e8f0" stroke-width="24" stroke-linecap="round"/>
-</svg>

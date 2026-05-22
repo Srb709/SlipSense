@@ -1,22 +1,15 @@
-import type { Metadata, Viewport } from "next";
-import "./globals.css";
+import './globals.css';
+import { ReactNode } from 'react';
 
-export const metadata: Metadata = {
-  title: "SlipSense",
-  description: "Educational bet slip risk analyzer for structure, odds pressure, and bankroll exposure.",
-  appleWebApp: { capable: true, title: "SlipSense" },
-  manifest: "/manifest.webmanifest",
-  icons: { apple: "/apple-touch-icon.svg" }
+export const metadata = {
+  title: 'My Philly Leads Tool',
+  description: 'Lead finder powered by public Philadelphia property data.',
 };
 
-export const viewport: Viewport = {
-  themeColor: "#0ea5e9"
-};
-
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="bg-slate-100 text-slate-900">{children}</body>
     </html>
   );
 }
