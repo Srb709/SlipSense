@@ -21,6 +21,8 @@ export async function POST(req: NextRequest) {
     const job = await enrichmentQueue.enqueue(parsed.leads);
     return NextResponse.json({ ok: true, job });
   } catch (error: any) {
-    return NextResponse.json({ ok: false, error: error.message || 'Invalid request' }, { status: 400 });
+    const message = error?.message || 'Invalid request';
+    const isValidationError = error instanceof z.ZodError;
+    return NextResponse.json({ ok: false, error: message }, { status: isValidationError ? 400 : 500 });
   }
 }
