@@ -19,12 +19,12 @@ export default function DashboardClient() {
       const params = new URLSearchParams(filters as Record<string, string>);
       const res = await fetch(`/api/leads?${params.toString()}`);
       if (!res.ok) {
+        let message = 'Failed to load leads.';
         try {
           const json = await res.json();
-          throw new Error(json.error || 'Failed to load leads.');
-        } catch {
-          throw new Error('Failed to load leads.');
-        }
+          message = json.error || message;
+        } catch {}
+        throw new Error(message);
       }
       const json = await res.json();
       setRows(json.data || []);
